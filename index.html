@@ -102,39 +102,48 @@
     .nav-cta:hover { opacity: 0.7; }
 
     /* ══════════════════════════════
-       01  HERO — full screen photo
+       01  HERO — split layout
     ══════════════════════════════ */
     .hero {
-      position: relative;
+      display: grid;
+      grid-template-columns: 42% 58%;
       height: 100vh;
       min-height: 640px;
       overflow: hidden;
     }
 
-    .hero img {
-      position: absolute;
-      inset: 0;
-      object-position: center 30%;
+    /* 왼쪽: 텍스트 */
+    .hero__left {
+      background: var(--black);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 0 64px 80px 56px;
+      position: relative;
+      z-index: 1;
     }
 
-    /* gradient: 아래만 어둡게 */
-    .hero::after {
+    /* 오른쪽: 사진 — object-fit:cover로 가득 채우되 제품 위치에 맞춤 */
+    .hero__right {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero__right img {
+      position: absolute;
+      inset: 0;
+      object-fit: cover;
+      object-position: 38% 62%;   /* 제품이 담긴 하단-중앙 영역을 보여줌 */
+    }
+
+    /* 오른쪽 왼쪽에 미세 그라데이션 (이음매 자연스럽게) */
+    .hero__right::before {
       content: '';
       position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        to bottom,
-        rgba(0,0,0,0)   50%,
-        rgba(0,0,0,0.58) 100%
-      );
-    }
-
-    .hero__text {
-      position: absolute;
+      inset: 0 auto 0 0;
+      width: 80px;
+      background: linear-gradient(to right, var(--black), transparent);
       z-index: 1;
-      bottom: 72px;
-      left: 56px;
-      color: var(--white);
     }
 
     .hero__label {
@@ -142,24 +151,25 @@
       font-weight: 500;
       letter-spacing: 0.26em;
       text-transform: uppercase;
-      opacity: 0.65;
-      margin-bottom: 18px;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 20px;
     }
 
     .hero__title {
-      font-size: clamp(80px, 13vw, 160px);
+      font-size: clamp(80px, 10vw, 140px);
       font-weight: 800;
       letter-spacing: -0.06em;
       line-height: 0.88;
+      color: var(--white);
       margin-bottom: 24px;
     }
 
     .hero__sub {
       font-family: var(--font-sub);
-      font-size: clamp(15px, 1.6vw, 20px);
+      font-size: clamp(15px, 1.5vw, 19px);
       font-weight: 300;
-      opacity: 0.82;
-      line-height: 1.6;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.65;
     }
 
     /* ══════════════════════════════
@@ -425,70 +435,165 @@
     .specs-right:hover img { transform: scale(1.03); }
 
     /* ══════════════════════════════
-       05  PRODUCT VIEWS (턴어라운드)
+       05  CAROUSEL (제품 뷰어)
     ══════════════════════════════ */
-    .views-section {
-      padding: 100px 56px;
+    .carousel-section {
+      padding: 100px 0 120px;
       background: var(--white);
     }
 
-    .views-header {
+    .carousel-header {
+      padding: 0 56px;
       margin-bottom: 56px;
     }
 
-    .views-header h2 {
+    .carousel-header h2 {
       font-size: clamp(26px, 3vw, 40px);
       font-weight: 800;
       letter-spacing: -0.04em;
       margin-top: 14px;
     }
 
-    .views-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 3px;
+    /* 슬라이더 래퍼 */
+    .carousel {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
     }
 
-    .view-item { overflow: hidden; background: var(--gray-f); }
+    /* 슬라이드 트랙 */
+    .carousel__track {
+      display: flex;
+      transition: transform 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      will-change: transform;
+    }
 
-    .view-item__img {
-      aspect-ratio: 4 / 5;
-      overflow: hidden;
+    /* 개별 슬라이드 */
+    .carousel__slide {
+      flex: 0 0 100%;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 68vh;
+      align-items: stretch;
+    }
+
+    /* 슬라이드 이미지 영역 */
+    .carousel__img {
+      background: var(--gray-f);
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 48px;
+      padding: 60px;
+      overflow: hidden;
     }
 
-    .view-item__img img {
-      object-fit: contain;
-      mix-blend-mode: multiply;   /* 누끼 */
-      transition: transform 0.7s ease;
-      height: 100%;
+    .carousel__img img {
       width: 100%;
+      height: auto;
+      max-height: 60vh;
+      object-fit: contain;
+      transition: transform 0.6s ease;
     }
 
-    .view-item:hover .view-item__img img { transform: scale(1.05); }
+    .carousel__slide:hover .carousel__img img { transform: scale(1.03); }
 
-    .view-item__info {
-      padding: 24px 28px 32px;
-      background: var(--white);
-      border-top: 1px solid var(--gray-e);
+    /* 슬라이드 텍스트 영역 */
+    .carousel__info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 72px 72px 72px 80px;
+      border-left: 1px solid var(--gray-e);
     }
 
-    .view-item__label {
-      font-size: 10px;
+    .carousel__num {
+      font-size: 11px;
       font-weight: 600;
       letter-spacing: 0.2em;
-      text-transform: uppercase;
       color: var(--gray-9);
-      margin-bottom: 6px;
+      margin-bottom: 28px;
     }
 
-    .view-item__title {
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
+    .carousel__label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gray-9);
+      margin-bottom: 14px;
+    }
+
+    .carousel__title {
+      font-size: clamp(24px, 2.8vw, 38px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+
+    .carousel__desc {
+      font-family: var(--font-sub);
+      font-size: 15px;
+      font-weight: 300;
+      color: #666;
+      line-height: 1.85;
+    }
+
+    /* 화살표 버튼 */
+    .carousel__controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 48px;
+    }
+
+    .carousel__btn {
+      width: 48px;
+      height: 48px;
+      border: 1px solid var(--black);
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, color 0.2s;
+      font-size: 18px;
+      color: var(--black);
+    }
+
+    .carousel__btn:hover {
+      background: var(--black);
+      color: var(--white);
+    }
+
+    .carousel__btn:disabled {
+      opacity: 0.2;
+      cursor: default;
+    }
+
+    /* 점(dot) 인디케이터 */
+    .carousel__dots {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-left: 8px;
+    }
+
+    .carousel__dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--gray-e);
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      transition: background 0.25s, transform 0.25s;
+    }
+
+    .carousel__dot.active {
+      background: var(--black);
+      transform: scale(1.3);
     }
 
     /* ══════════════════════════════
@@ -587,14 +692,18 @@
 
 <!-- ════════ 01 HERO ════════ -->
 <section class="hero">
-  <img
-    src="./메인/remove knife and 양파랑 파가 흰색 바구니에 텃밭처럼 심어져있으면 좋겠어.png"
-    alt="Rootie 주방">
-
-  <div class="hero__text">
+  <!-- 왼쪽: 텍스트 -->
+  <div class="hero__left">
     <p class="hero__label">1인 홈가드닝 솔루션</p>
     <h1 class="hero__title">Rootie</h1>
-    <p class="hero__sub">일상에 뿌리내리는 작은 자연</p>
+    <p class="hero__sub">일상에 뿌리내리는<br>작은 자연</p>
+  </div>
+
+  <!-- 오른쪽: 라이프스타일 사진 (짤림 없음) -->
+  <div class="hero__right">
+    <img
+      src="./메인/remove knife and 양파랑 파가 흰색 바구니에 텃밭처럼 심어져있으면 좋겠어.png"
+      alt="Rootie 주방 라이프스타일">
   </div>
 </section>
 
@@ -602,10 +711,10 @@
 <!-- ════════ 02 PRODUCT INTRO ════════ -->
 <section class="intro" id="intro">
 
-  <!-- 왼쪽: 제품 이미지 누끼 -->
+  <!-- 왼쪽: 제품 이미지 누끼 (Photoroom) -->
   <div class="intro__img fade">
     <img
-      src="./턴어라운드/Front - New view.png"
+      src="./턴어라운드/Front - New view-Photoroom.png"
       alt="Rootie One 정면">
   </div>
 
@@ -742,54 +851,106 @@
     </div>
   </div>
 
-  <!-- 오른쪽: 제품 이미지 (누끼) -->
+  <!-- 오른쪽: 제품 이미지 (Photoroom 누끼) -->
   <div class="specs-right fade">
     <img
-      src="./턴어라운드/260420-151158-add_LED_light_bar_under_wood_(1).jpg"
+      src="./턴어라운드/260420-151158-add_LED_light_bar_under_wood_(1)-Photoroom.png"
       alt="Rootie One 구조 분해도">
   </div>
 
 </section>
 
 
-<!-- ════════ 05 PRODUCT VIEWS ════════ -->
-<section class="views-section">
-  <div class="views-header fade">
+<!-- ════════ 05 CAROUSEL ════════ -->
+<section class="carousel-section">
+  <div class="carousel-header fade">
     <p class="specs-eyebrow">Product Detail</p>
     <h2>360° 뷰</h2>
   </div>
 
-  <div class="views-grid">
-    <div class="view-item fade">
-      <div class="view-item__img">
-        <img src="./턴어라운드/Front - New view.png" alt="정면">
-      </div>
-      <div class="view-item__info">
-        <p class="view-item__label">Front View</p>
-        <h3 class="view-item__title">정면 — 스테인레스 본체</h3>
-      </div>
-    </div>
+  <div class="carousel">
+    <div class="carousel__track" id="carouselTrack">
 
-    <div class="view-item fade fade-d1">
-      <div class="view-item__img">
-        <img src="./턴어라운드/Left - New view.png" alt="측면">
+      <!-- SLIDE 1 -->
+      <div class="carousel__slide">
+        <div class="carousel__img">
+          <img src="./턴어라운드/Front - New view-Photoroom.png" alt="정면 뷰">
+        </div>
+        <div class="carousel__info">
+          <span class="carousel__num">01 / 03</span>
+          <p class="carousel__label">Front View</p>
+          <h3 class="carousel__title">정면<br>스테인레스 본체</h3>
+          <p class="carousel__desc">
+            전면 개폐형 도어와 스테인레스 스틸 본체.
+            도어를 열면 LED 조명이 켜지며
+            내부 재배 트레이를 확인할 수 있습니다.
+          </p>
+          <div class="carousel__controls">
+            <button class="carousel__btn" id="prevBtn" onclick="moveSlide(-1)" disabled>←</button>
+            <button class="carousel__btn" id="nextBtn" onclick="moveSlide(1)">→</button>
+            <div class="carousel__dots">
+              <button class="carousel__dot active" onclick="goSlide(0)"></button>
+              <button class="carousel__dot" onclick="goSlide(1)"></button>
+              <button class="carousel__dot" onclick="goSlide(2)"></button>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="view-item__info">
-        <p class="view-item__label">Side View</p>
-        <h3 class="view-item__title">측면 — 온도 조절 & 급수 체크</h3>
-      </div>
-    </div>
 
-    <div class="view-item fade fade-d2">
-      <div class="view-item__img">
-        <img src="./턴어라운드/260420-151158-add_LED_light_bar_under_wood_(1).jpg" alt="분해도">
+      <!-- SLIDE 2 -->
+      <div class="carousel__slide">
+        <div class="carousel__img">
+          <img src="./턴어라운드/Left - New view-Photoroom.png" alt="측면 뷰">
+        </div>
+        <div class="carousel__info">
+          <span class="carousel__num">02 / 03</span>
+          <p class="carousel__label">Side View</p>
+          <h3 class="carousel__title">측면<br>온도 조절 & 급수 체크</h3>
+          <p class="carousel__desc">
+            측면 디스플레이에서 온도·습도를 실시간 확인.
+            자동급수량 체크 시스템이 내장되어
+            최적의 생장 환경을 유지합니다.
+          </p>
+          <div class="carousel__controls">
+            <button class="carousel__btn" onclick="moveSlide(-1)">←</button>
+            <button class="carousel__btn" onclick="moveSlide(1)">→</button>
+            <div class="carousel__dots">
+              <button class="carousel__dot" onclick="goSlide(0)"></button>
+              <button class="carousel__dot active" onclick="goSlide(1)"></button>
+              <button class="carousel__dot" onclick="goSlide(2)"></button>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="view-item__info">
-        <p class="view-item__label">Exploded View</p>
-        <h3 class="view-item__title">구조 — 분리형 모듈 설계</h3>
+
+      <!-- SLIDE 3 -->
+      <div class="carousel__slide">
+        <div class="carousel__img">
+          <img src="./턴어라운드/260420-151158-add_LED_light_bar_under_wood_(1)-Photoroom.png" alt="분해 구조">
+        </div>
+        <div class="carousel__info">
+          <span class="carousel__num">03 / 03</span>
+          <p class="carousel__label">Exploded View</p>
+          <h3 class="carousel__title">구조<br>분리형 모듈 설계</h3>
+          <p class="carousel__desc">
+            나무 오브제 상판 → LED 조명 → 자동급수관 →
+            분리 레일 → 화분 트레이 → 수도관.
+            모든 파트가 분리·청소 가능합니다.
+          </p>
+          <div class="carousel__controls">
+            <button class="carousel__btn" onclick="moveSlide(-1)">←</button>
+            <button class="carousel__btn" id="lastNext" onclick="moveSlide(1)" disabled>→</button>
+            <div class="carousel__dots">
+              <button class="carousel__dot" onclick="goSlide(0)"></button>
+              <button class="carousel__dot" onclick="goSlide(1)"></button>
+              <button class="carousel__dot active" onclick="goSlide(2)"></button>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
+
+    </div><!-- /track -->
+  </div><!-- /carousel -->
 </section>
 
 
@@ -816,24 +977,66 @@
 
 
 <script>
-  // Fade-in on scroll
+  /* ── Fade-in on scroll ── */
   const io = new IntersectionObserver(entries => {
     entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.classList.add('on');
-        io.unobserve(e.target);
-      }
+      if (e.isIntersecting) { e.target.classList.add('on'); io.unobserve(e.target); }
     });
   }, { threshold: 0.1 });
-
   document.querySelectorAll('.fade').forEach(el => io.observe(el));
 
-  // Nav scroll
+  /* ── Nav scroll ── */
   const nav = document.querySelector('.nav');
   window.addEventListener('scroll', () => {
     nav.style.background = window.scrollY > 50
-      ? 'rgba(255,255,255,0.97)'
-      : 'rgba(255,255,255,0.88)';
+      ? 'rgba(255,255,255,0.97)' : 'rgba(255,255,255,0.88)';
+  });
+
+  /* ── Carousel ── */
+  const track  = document.getElementById('carouselTrack');
+  const slides = track.querySelectorAll('.carousel__slide');
+  const total  = slides.length;
+  let cur = 0;
+
+  function updateCarousel() {
+    // 트랙 이동
+    track.style.transform = `translateX(-${cur * 100}%)`;
+
+    // 모든 슬라이드의 dots & 버튼 동기화
+    slides.forEach((slide, idx) => {
+      const dots = slide.querySelectorAll('.carousel__dot');
+      dots.forEach((d, di) => d.classList.toggle('active', di === cur));
+
+      const btns = slide.querySelectorAll('.carousel__btn');
+      btns[0].disabled = (cur === 0);           // prev
+      btns[1].disabled = (cur === total - 1);   // next
+    });
+  }
+
+  function moveSlide(dir) {
+    const next = cur + dir;
+    if (next < 0 || next >= total) return;
+    cur = next;
+    updateCarousel();
+  }
+
+  function goSlide(idx) {
+    cur = idx;
+    updateCarousel();
+  }
+
+  // 키보드 지원
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft')  moveSlide(-1);
+    if (e.key === 'ArrowRight') moveSlide(1);
+  });
+
+  // 터치 스와이프 지원
+  let touchStartX = 0;
+  track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
+  track.addEventListener('touchend',   e => {
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) moveSlide(diff > 0 ? 1 : -1);
   });
 </script>
 

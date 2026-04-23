@@ -1,1043 +1,659 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rootie — 1인 홈가드닝</title>
+  <title>Rootie®</title>
 
   <link rel="stylesheet" as="style" crossorigin
     href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;500&display=swap" rel="stylesheet">
 
   <style>
-    /* ─── Reset ─── */
+    /* ─── Base ─── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --font-main : 'Pretendard', -apple-system, sans-serif;
-      --font-sub  : '조선명조', 'Noto Serif KR', serif;
-      --black     : #0a0a0a;
-      --white     : #ffffff;
-      --gray-f    : #f6f6f6;
-      --gray-e    : #e5e5e5;
-      --gray-9    : #999;
+      --black : #0a0a0a;
+      --white : #ffffff;
+      --gray  : #efefef;
+      --line  : rgba(0,0,0,0.1);
+      --font  : 'Pretendard', -apple-system, sans-serif;
+      --pad   : 20px;
+      --fs    : 13px;
     }
 
-    html { scroll-behavior: smooth; }
+    html { font-size: var(--fs); scroll-behavior: smooth; }
 
     body {
-      font-family: var(--font-main);
-      background: var(--white);
+      font-family: var(--font);
+      font-weight: 400;
       color: var(--black);
-      overflow-x: hidden;
+      background: var(--white);
+      line-height: 1.5;
       -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
 
-    img { display: block; width: 100%; height: 100%; object-fit: cover; }
-    a   { text-decoration: none; color: inherit; }
+    a { text-decoration: none; color: inherit; }
 
-    /* ─── Fade-in ─── */
-    .fade {
-      opacity: 0;
-      transform: translateY(28px);
-      transition: opacity 0.75s ease, transform 0.75s ease;
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
-    .fade.on { opacity: 1; transform: translateY(0); }
-    .fade-d1  { transition-delay: 0.12s; }
-    .fade-d2  { transition-delay: 0.24s; }
-    .fade-d3  { transition-delay: 0.36s; }
 
-    /* ══════════════════════════════
+    /* ─── Custom scrollbar ─── */
+    ::-webkit-scrollbar       { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.18); }
+
+    /* ════════════════════════════════
        NAV
-    ══════════════════════════════ */
+    ════════════════════════════════ */
     .nav {
       position: fixed;
       inset: 0 0 auto 0;
-      z-index: 999;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 48px;
-      height: 68px;
-      background: rgba(255,255,255,0.88);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border-bottom: 1px solid rgba(0,0,0,0.06);
-    }
-
-    .nav-logo {
-      font-size: 20px;
-      font-weight: 800;
-      letter-spacing: -0.06em;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 40px;
-      list-style: none;
-    }
-
-    .nav-links a {
-      font-size: 12px;
-      font-weight: 500;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      opacity: 0.45;
-      transition: opacity 0.25s;
-    }
-    .nav-links a:hover { opacity: 1; }
-
-    .nav-cta {
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding: 10px 24px;
-      background: var(--black);
-      color: var(--white);
-      transition: opacity 0.25s;
-    }
-    .nav-cta:hover { opacity: 0.7; }
-
-    /* ══════════════════════════════
-       01  HERO — split layout
-    ══════════════════════════════ */
-    .hero {
-      display: grid;
-      grid-template-columns: 42% 58%;
-      height: 100vh;
-      min-height: 640px;
-      overflow: hidden;
-    }
-
-    /* 왼쪽: 텍스트 */
-    .hero__left {
-      background: var(--black);
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 0 64px 80px 56px;
-      position: relative;
-      z-index: 1;
-    }
-
-    /* 오른쪽: 사진 — object-fit:cover로 가득 채우되 제품 위치에 맞춤 */
-    .hero__right {
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero__right img {
-      position: absolute;
-      inset: 0;
-      object-fit: cover;
-      object-position: 38% 62%;   /* 제품이 담긴 하단-중앙 영역을 보여줌 */
-    }
-
-    /* 오른쪽 왼쪽에 미세 그라데이션 (이음매 자연스럽게) */
-    .hero__right::before {
-      content: '';
-      position: absolute;
-      inset: 0 auto 0 0;
-      width: 80px;
-      background: linear-gradient(to right, var(--black), transparent);
-      z-index: 1;
-    }
-
-    .hero__label {
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.26em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.45);
-      margin-bottom: 20px;
-    }
-
-    .hero__title {
-      font-size: clamp(80px, 10vw, 140px);
-      font-weight: 800;
-      letter-spacing: -0.06em;
-      line-height: 0.88;
-      color: var(--white);
-      margin-bottom: 24px;
-    }
-
-    .hero__sub {
-      font-family: var(--font-sub);
-      font-size: clamp(15px, 1.5vw, 19px);
-      font-weight: 300;
-      color: rgba(255,255,255,0.6);
-      line-height: 1.65;
-    }
-
-    /* ══════════════════════════════
-       02  PRODUCT INTRO
-         좌: 제품 이미지(누끼)  우: 핵심 스펙
-    ══════════════════════════════ */
-    .intro {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      min-height: 90vh;
-    }
-
-    /* 누끼: 흰 배경 이미지를 multiply로 합성 */
-    .intro__img {
-      background: var(--gray-f);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 60px;
-      overflow: hidden;
-    }
-
-    .intro__img img {
-      width: 100%;
-      height: auto;
-      object-fit: contain;
-      mix-blend-mode: multiply;   /* 누끼 효과 */
-      transition: transform 0.7s ease;
-    }
-    .intro__img:hover img { transform: scale(1.04); }
-
-    .intro__info {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 80px 64px 80px 72px;
-      border-left: 1px solid var(--gray-e);
-    }
-
-    .intro__eyebrow {
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.24em;
-      text-transform: uppercase;
-      color: var(--gray-9);
-      margin-bottom: 32px;
-    }
-
-    .intro__name {
-      font-size: clamp(40px, 5vw, 64px);
-      font-weight: 800;
-      letter-spacing: -0.05em;
-      line-height: 1;
-      margin-bottom: 12px;
-    }
-
-    .intro__tagline {
-      font-family: var(--font-sub);
-      font-size: 17px;
-      font-weight: 300;
-      color: var(--gray-9);
-      margin-bottom: 56px;
-      line-height: 1.6;
-    }
-
-    /* 핵심 키워드 3개 */
-    .intro__pills {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      margin-bottom: 56px;
-    }
-
-    .pill {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      font-size: 14px;
-      font-weight: 500;
-    }
-
-    .pill::before {
-      content: '';
-      display: block;
-      width: 6px;
-      height: 6px;
-      background: var(--black);
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-
-    /* 스탯 3개 */
-    .intro__stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0;
-      border-top: 1px solid var(--gray-e);
-      padding-top: 40px;
-    }
-
-    .stat {
-      padding-right: 24px;
-    }
-    .stat + .stat {
-      padding-left: 24px;
-      border-left: 1px solid var(--gray-e);
-    }
-
-    .stat__num {
-      font-size: 34px;
-      font-weight: 800;
-      letter-spacing: -0.04em;
-      line-height: 1;
-      margin-bottom: 6px;
-    }
-
-    .stat__label {
-      font-size: 11px;
-      font-weight: 400;
-      color: var(--gray-9);
-      line-height: 1.4;
-    }
-
-    /* ══════════════════════════════
-       03  LIFESTYLE — 사진 그리드
-    ══════════════════════════════ */
-    .lifestyle { background: var(--black); }
-
-    .lifestyle__header {
-      padding: 72px 56px 48px;
-      display: flex;
-      align-items: baseline;
-      gap: 20px;
-    }
-
-    .lifestyle__header h2 {
-      font-size: clamp(28px, 3.5vw, 44px);
-      font-weight: 800;
-      letter-spacing: -0.04em;
-      color: var(--white);
-    }
-
-    .lifestyle__header span {
-      font-family: var(--font-sub);
-      font-size: 14px;
-      font-weight: 300;
-      color: rgba(255,255,255,0.38);
-    }
-
-    /* 3-칸 그리드 */
-    .lifestyle__grid {
-      display: grid;
-      grid-template-columns: 1.4fr 1fr 1fr;
-      grid-template-rows: 480px 360px;
-      gap: 3px;
-    }
-
-    .lg { overflow: hidden; position: relative; }
-    .lg img { transition: transform 0.9s ease; }
-    .lg:hover img { transform: scale(1.05); }
-
-    .lg--tall { grid-row: 1 / 3; }   /* 왼쪽 큰 이미지 */
-    .lg--a    { grid-column: 1; }
-    .lg--b    { grid-column: 2; grid-row: 1; }
-    .lg--c    { grid-column: 3; grid-row: 1; }
-    .lg--d    { grid-column: 2; grid-row: 2; }
-    .lg--e    { grid-column: 3; grid-row: 2; }
-
-    .lifestyle__bottom-bar {
-      padding: 36px 56px;
-      border-top: 1px solid rgba(255,255,255,0.08);
-      display: flex;
-      gap: 48px;
-    }
-
-    .bottom-kw {
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.25);
-    }
-
-    /* ══════════════════════════════
-       04  SPECS + PHOTO (side by side)
-    ══════════════════════════════ */
-    .specs-section {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      min-height: 80vh;
-    }
-
-    /* 왼쪽: 텍스트/사양 */
-    .specs-left {
-      padding: 96px 72px 96px 56px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      border-right: 1px solid var(--gray-e);
-    }
-
-    .specs-eyebrow {
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.24em;
-      text-transform: uppercase;
-      color: var(--gray-9);
-      margin-bottom: 24px;
-    }
-
-    .specs-title {
-      font-family: var(--font-sub);
-      font-size: clamp(28px, 3vw, 42px);
-      font-weight: 400;
-      line-height: 1.35;
-      letter-spacing: -0.01em;
-      margin-bottom: 52px;
-    }
-
-    .specs-table { border-top: 2px solid var(--black); }
-
-    .spec-row {
+      z-index: 200;
       display: flex;
       justify-content: space-between;
-      align-items: baseline;
-      padding: 16px 0;
-      border-bottom: 1px solid var(--gray-e);
-      gap: 20px;
+      align-items: center;
+      padding: 11px var(--pad);
+      background: var(--white);
+      border-bottom: 1px solid var(--line);
     }
 
-    .spec-key {
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--gray-9);
-      letter-spacing: 0.04em;
+    .nav a, .nav span {
+      font-size: var(--fs);
+      font-weight: 400;
+      letter-spacing: 0;
+      cursor: pointer;
+    }
+
+    .nav a:hover { opacity: 0.45; }
+
+    /* ════════════════════════════════
+       PAGE WRAPPER
+    ════════════════════════════════ */
+    .page {
+      padding-top: 38px; /* nav height */
+    }
+
+    /* corner markers row */
+    .corners {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px var(--pad);
+    }
+    .sq { font-size: 9px; line-height: 1; }
+
+    /* ════════════════════════════════
+       ENTRY SECTION  (Cargo project row)
+    ════════════════════════════════ */
+    .entry {
+      border-top: 1px solid var(--line);
+    }
+
+    /* header row: year | name | more */
+    .entry__head {
+      display: grid;
+      grid-template-columns: 100px 1fr 90px;
+      align-items: center;
+      padding: 13px var(--pad);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .entry__year { font-size: var(--fs); }
+
+    .entry__name {
+      font-size: var(--fs);
+      text-align: center;
+      letter-spacing: 0;
+    }
+
+    .entry__more {
+      font-size: var(--fs);
+      text-align: right;
+      cursor: pointer;
       white-space: nowrap;
     }
+    .entry__more:hover { opacity: 0.4; }
 
-    .spec-val {
-      font-size: 14px;
-      font-weight: 600;
-      letter-spacing: -0.01em;
-      text-align: right;
+    /* counter below media */
+    .entry__counter {
+      text-align: center;
+      padding: 11px var(--pad);
+      font-size: 12px;
+      color: rgba(0,0,0,0.38);
+      border-top: 1px solid var(--line);
+      letter-spacing: 0.04em;
     }
 
-    /* 오른쪽: 제품 이미지 */
-    .specs-right {
-      background: var(--gray-f);
+    /* ════════════════════════════════
+       MEDIA: SINGLE centered image
+       (Cargo portrait style)
+    ════════════════════════════════ */
+    .media-single {
       display: flex;
-      align-items: center;
       justify-content: center;
-      padding: 60px;
-      overflow: hidden;
-    }
-
-    .specs-right img {
-      width: 100%;
-      height: auto;
-      object-fit: contain;
-      mix-blend-mode: multiply;   /* 누끼 */
-      transition: transform 0.7s ease;
-    }
-    .specs-right:hover img { transform: scale(1.03); }
-
-    /* ══════════════════════════════
-       05  CAROUSEL (제품 뷰어)
-    ══════════════════════════════ */
-    .carousel-section {
-      padding: 100px 0 120px;
+      align-items: flex-start;
+      padding: 48px var(--pad) 0;
       background: var(--white);
-    }
-
-    .carousel-header {
-      padding: 0 56px;
-      margin-bottom: 56px;
-    }
-
-    .carousel-header h2 {
-      font-size: clamp(26px, 3vw, 40px);
-      font-weight: 800;
-      letter-spacing: -0.04em;
-      margin-top: 14px;
-    }
-
-    /* 슬라이더 래퍼 */
-    .carousel {
       position: relative;
-      width: 100%;
+    }
+
+    .media-single__wrap {
+      width: 54%;
+      max-width: 680px;
+      background: var(--gray);
       overflow: hidden;
+      border: 1px solid var(--line);
+      cursor: pointer;
     }
 
-    /* 슬라이드 트랙 */
-    .carousel__track {
-      display: flex;
-      transition: transform 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-      will-change: transform;
+    .media-single__wrap img {
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      transition: opacity 0.35s ease;
     }
 
-    /* 개별 슬라이드 */
-    .carousel__slide {
-      flex: 0 0 100%;
-      width: 100%;
+    /* paged single */
+    .media-single__wrap.paged {
+      position: relative;
+    }
+
+    /* ════════════════════════════════
+       MEDIA: GRID (4-col)
+    ════════════════════════════════ */
+    .media-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      min-height: 68vh;
-      align-items: stretch;
+      grid-template-columns: repeat(4, 1fr);
+      border-bottom: none;
+      position: relative;
     }
 
-    /* 슬라이드 이미지 영역 */
-    .carousel__img {
-      background: var(--gray-f);
+    .media-grid__page {
+      display: contents; /* children participate in parent grid */
+    }
+
+    .media-grid__page.hidden { display: none; }
+
+    .grid-cell {
+      height: 480px;
+      overflow: hidden;
+      border-right: 1px solid var(--line);
+      position: relative;
+      cursor: pointer;
+    }
+
+    .grid-cell:last-child { border-right: none; }
+    .grid-cell:nth-child(4n) { border-right: none; }
+
+    .grid-cell img { transition: transform 0.7s ease; }
+    .grid-cell:hover img { transform: scale(1.03); }
+
+    /* ════════════════════════════════
+       MEDIA: PRODUCT single (portrait)
+       — 제품 Photoroom 이미지
+    ════════════════════════════════ */
+    .media-product {
       display: flex;
-      align-items: center;
       justify-content: center;
-      padding: 60px;
+      align-items: flex-start;
+      padding: 48px var(--pad) 0;
+      position: relative;
       overflow: hidden;
     }
 
-    .carousel__img img {
+    .media-product__slides {
+      width: 54%;
+      max-width: 680px;
+      position: relative;
+    }
+
+    .product-slide {
+      display: none;
+    }
+
+    .product-slide.active {
+      display: block;
+    }
+
+    .product-slide img {
       width: 100%;
       height: auto;
-      max-height: 60vh;
+      aspect-ratio: 3 / 2;
       object-fit: contain;
-      transition: transform 0.6s ease;
+      background: var(--gray);
+      border: 1px solid var(--line);
+      mix-blend-mode: multiply;
     }
 
-    .carousel__slide:hover .carousel__img img { transform: scale(1.03); }
-
-    /* 슬라이드 텍스트 영역 */
-    .carousel__info {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 72px 72px 72px 80px;
-      border-left: 1px solid var(--gray-e);
-    }
-
-    .carousel__num {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.2em;
-      color: var(--gray-9);
-      margin-bottom: 28px;
-    }
-
-    .carousel__label {
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: var(--gray-9);
-      margin-bottom: 14px;
-    }
-
-    .carousel__title {
-      font-size: clamp(24px, 2.8vw, 38px);
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      line-height: 1.15;
-      margin-bottom: 20px;
-    }
-
-    .carousel__desc {
-      font-family: var(--font-sub);
-      font-size: 15px;
-      font-weight: 300;
-      color: #666;
-      line-height: 1.85;
-    }
-
-    /* 화살표 버튼 */
-    .carousel__controls {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-top: 48px;
-    }
-
-    .carousel__btn {
-      width: 48px;
-      height: 48px;
-      border: 1px solid var(--black);
-      background: transparent;
-      cursor: pointer;
+    /* ════════════════════════════════
+       PAGINATION CONTROLS  (shared)
+    ════════════════════════════════ */
+    .pag-wrap {
+      text-align: center;
+      padding: 11px var(--pad);
+      border-top: 1px solid var(--line);
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.2s, color 0.2s;
-      font-size: 18px;
-      color: var(--black);
+      gap: 16px;
+      font-size: 12px;
+      color: rgba(0,0,0,0.38);
+      letter-spacing: 0.04em;
     }
 
-    .carousel__btn:hover {
-      background: var(--black);
-      color: var(--white);
-    }
-
-    .carousel__btn:disabled {
-      opacity: 0.2;
-      cursor: default;
-    }
-
-    /* 점(dot) 인디케이터 */
-    .carousel__dots {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      margin-left: 8px;
-    }
-
-    .carousel__dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--gray-e);
+    .pag-btn {
+      background: none;
       border: none;
       cursor: pointer;
-      padding: 0;
-      transition: background 0.25s, transform 0.25s;
+      font-size: 12px;
+      color: rgba(0,0,0,0.38);
+      padding: 0 4px;
+      transition: color 0.2s;
+      font-family: var(--font);
     }
 
-    .carousel__dot.active {
-      background: var(--black);
-      transform: scale(1.3);
+    .pag-btn:hover   { color: var(--black); }
+    .pag-btn:disabled { opacity: 0.2; cursor: default; }
+
+    .pag-counter { min-width: 48px; text-align: center; }
+
+    /* ════════════════════════════════
+       INFORMATION SECTION
+    ════════════════════════════════ */
+    #info {
+      border-top: 1px solid var(--line);
     }
 
-    /* ══════════════════════════════
-       06  CTA
-    ══════════════════════════════ */
-    .cta {
-      background: var(--black);
-      color: var(--white);
-      padding: 140px 56px;
-      text-align: center;
+    .info-body {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      min-height: 44vh;
     }
 
-    .cta__label {
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.26em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.3);
-      margin-bottom: 28px;
+    .info-body__left {
+      padding: var(--pad);
+      border-right: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
     }
 
-    .cta__title {
-      font-family: var(--font-sub);
-      font-size: clamp(34px, 5vw, 62px);
+    .info-img {
+      width: 100%;
+      aspect-ratio: 1;
+      background: var(--gray);
+      border: 1px solid var(--line);
+      overflow: hidden;
+    }
+
+    .info-img img {
+      object-fit: contain;
+      mix-blend-mode: multiply;
+    }
+
+    .info-meta {
+      font-size: 12px;
+      color: rgba(0,0,0,0.45);
+      line-height: 1.9;
+    }
+
+    .info-body__right {
+      padding: var(--pad) 40px;
+      display: flex;
+      align-items: flex-start;
+    }
+
+    .info-text {
+      font-size: clamp(18px, 2.2vw, 30px);
       font-weight: 400;
-      line-height: 1.3;
-      margin-bottom: 52px;
+      line-height: 1.42;
+      letter-spacing: -0.01em;
+      max-width: 860px;
     }
 
-    .cta__btn {
-      display: inline-block;
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding: 18px 54px;
-      background: var(--white);
-      color: var(--black);
-      transition: opacity 0.25s;
-    }
-    .cta__btn:hover { opacity: 0.82; }
-
-    /* ══════════════════════════════
-       FOOTER
-    ══════════════════════════════ */
-    .footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 36px 56px;
-      border-top: 1px solid var(--gray-e);
+    /* ════════════════════════════════
+       INFO COLUMNS  (Contact / Features / Specs)
+    ════════════════════════════════ */
+    .info-cols {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-top: 1px solid var(--line);
     }
 
-    .footer__logo {
-      font-size: 17px;
-      font-weight: 800;
-      letter-spacing: -0.05em;
+    .info-col {
+      padding: var(--pad);
+      border-right: 1px solid var(--line);
     }
 
-    .footer__copy {
-      font-size: 11px;
-      color: var(--gray-9);
+    .info-col:last-child { border-right: none; }
+
+    .info-col__title {
+      font-size: var(--fs);
+      font-weight: 400;
+      margin-bottom: 18px;
     }
 
-    .footer__nav {
-      display: flex;
-      gap: 28px;
+    .info-col__list {
       list-style: none;
     }
 
-    .footer__nav a {
-      font-size: 11px;
-      font-weight: 400;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--gray-9);
-      transition: color 0.2s;
+    .info-col__list li {
+      font-size: 12px;
+      line-height: 1.9;
+      color: rgba(0,0,0,0.55);
+      padding-left: 14px;
     }
-    .footer__nav a:hover { color: var(--black); }
 
+    /* ════════════════════════════════
+       FOOTER
+    ════════════════════════════════ */
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px var(--pad);
+      border-top: 1px solid var(--line);
+      font-size: var(--fs);
+    }
+
+    .footer__time { color: rgba(0,0,0,0.45); font-variant-numeric: tabular-nums; }
+    .footer__copy { color: rgba(0,0,0,0.45); }
   </style>
 </head>
 <body>
 
-<!-- ════════ NAV ════════ -->
+<!-- ════════════ NAV ════════════ -->
 <nav class="nav">
-  <a href="#" class="nav-logo">Rootie</a>
-  <ul class="nav-links">
-    <li><a href="#intro">제품</a></li>
-    <li><a href="#lifestyle">라이프스타일</a></li>
-    <li><a href="#specs">사양</a></li>
-  </ul>
-  <a href="#cta" class="nav-cta">구매하기</a>
+  <span>■ Rootie</span>
+  <a href="#info">Information ■</a>
 </nav>
 
+<div class="page">
 
-<!-- ════════ 01 HERO ════════ -->
-<section class="hero">
-  <!-- 왼쪽: 텍스트 -->
-  <div class="hero__left">
-    <p class="hero__label">1인 홈가드닝 솔루션</p>
-    <h1 class="hero__title">Rootie</h1>
-    <p class="hero__sub">일상에 뿌리내리는<br>작은 자연</p>
+  <!-- top corners -->
+  <div class="corners">
+    <span class="sq">■</span>
+    <span class="sq">■</span>
   </div>
 
-  <!-- 오른쪽: 라이프스타일 사진 (짤림 없음) -->
-  <div class="hero__right">
-    <img
-      src="./메인/remove knife and 양파랑 파가 흰색 바구니에 텃밭처럼 심어져있으면 좋겠어.png"
-      alt="Rootie 주방 라이프스타일">
-  </div>
-</section>
-
-
-<!-- ════════ 02 PRODUCT INTRO ════════ -->
-<section class="intro" id="intro">
-
-  <!-- 왼쪽: 제품 이미지 누끼 (Photoroom) -->
-  <div class="intro__img fade">
-    <img
-      src="./턴어라운드/Front - New view-Photoroom.png"
-      alt="Rootie One 정면">
-  </div>
-
-  <!-- 오른쪽: 제품 정보 -->
-  <div class="intro__info">
-    <p class="intro__eyebrow fade">Product</p>
-    <h2 class="intro__name fade fade-d1">Rootie One</h2>
-    <p class="intro__tagline fade fade-d1">스마트 홈가드닝 유닛</p>
-
-    <div class="intro__pills fade fade-d2">
-      <span class="pill">식물 생장용 LED 조명 내장</span>
-      <span class="pill">자동급수 + 온도 조절 시스템</span>
-      <span class="pill">분리 가능한 레일 & 화분 트레이</span>
-      <span class="pill">이동형 캐스터 휠 (4륜)</span>
+  <!-- ══════════════════════════════════
+       ENTRY 01 — single hero image
+  ══════════════════════════════════ -->
+  <section class="entry">
+    <div class="entry__head">
+      <span class="entry__year">■ 2025</span>
+      <span class="entry__name">Rootie One, Smart Garden Unit</span>
+      <a class="entry__more" href="#info">More →</a>
     </div>
 
-    <div class="intro__stats fade fade-d3">
-      <div class="stat">
-        <div class="stat__num">90<small style="font-size:0.45em;font-weight:400;">cm</small></div>
-        <div class="stat__label">전체 높이</div>
-      </div>
-      <div class="stat">
-        <div class="stat__num">2단</div>
-        <div class="stat__label">재배 트레이</div>
-      </div>
-      <div class="stat">
-        <div class="stat__num">LED</div>
-        <div class="stat__label">성장 조명</div>
+    <!-- single hero image -->
+    <div class="media-single">
+      <div class="media-single__wrap">
+        <img
+          src="./메인/remove knife and 양파랑 파가 흰색 바구니에 텃밭처럼 심어져있으면 좋겠어.png"
+          alt="Rootie One in kitchen">
       </div>
     </div>
-  </div>
 
-</section>
+    <div class="entry__counter">01 / 01</div>
+  </section>
 
-
-<!-- ════════ 03 LIFESTYLE GRID ════════ -->
-<section class="lifestyle" id="lifestyle">
-  <div class="lifestyle__header fade">
-    <h2>어디서나</h2>
-    <span>주방 · 거실 · 발코니</span>
-  </div>
-
-  <div class="lifestyle__grid">
-    <!-- 왼쪽 tall -->
-    <div class="lg lg--a lg--tall fade">
-      <img
-        src="./메인/Cozy apartment balcony, wooden flooring, lush green indoor plants and Monstera, soft natural outdoor lighting, urban city view blurred in the background, peaceful atmosphere, hyper-realistic, architectural visualiz.png"
-        alt="발코니">
+  <!-- ══════════════════════════════════
+       ENTRY 02 — lifestyle image grid (paginated)
+  ══════════════════════════════════ -->
+  <section class="entry">
+    <div class="entry__head">
+      <span class="entry__year">■ 2025</span>
+      <span class="entry__name">Home Life, Kitchen &amp; Balcony</span>
+      <span class="entry__more" onclick="scrollToTop()">View →</span>
     </div>
-    <!-- 오른쪽 상단 2개 -->
-    <div class="lg lg--b fade fade-d1">
-      <img
-        src="./메인/Modern minimalist kitchen interior, marble countertop, wooden cabinetry, soft morning sunlight through a window, blurred backsplash tiles, cinematic lighting, photorealistic, 8k resolution, high-end lifestyle photo.png"
-        alt="주방">
-    </div>
-    <div class="lg lg--c fade fade-d2">
-      <img
-        src="./메인/Contemporary living room interior, stylish TV stand with a large screen, neutral tone plastered wall, indirect warm LED lighting, minimalist decor, soft shadows, high-quality interior design magazine style, 8k, sha.png"
-        alt="거실">
-    </div>
-    <!-- 오른쪽 하단 2개 -->
-    <div class="lg lg--d fade fade-d1">
-      <img
-        src="./메인/Cozy apartment balcony, wooden flooring, lush green indoor plants and Monstera, soft natural outdoor lighting, urban city view blurred in the background, peaceful atmosphere, hyper-realistic, architectural visu (1).png"
-        alt="발코니 야경">
-    </div>
-    <div class="lg lg--e fade fade-d2">
-      <img
-        src="./메인/Contemporary living room interior, stylish TV stand with a large screen, neutral tone plastered wall, indirect warm LED lighting, minimalist decor, soft shadows, high-quality interior design magazine style, 8k, (1).png"
-        alt="거실 와이드">
-    </div>
-  </div>
 
-  <div class="lifestyle__bottom-bar">
-    <span class="bottom-kw">Home Gardening</span>
-    <span class="bottom-kw">Smart Living</span>
-    <span class="bottom-kw">Solo Life</span>
-    <span class="bottom-kw">Fresh Table</span>
-  </div>
-</section>
-
-
-<!-- ════════ 04 SPECS + PHOTO ════════ -->
-<section class="specs-section" id="specs">
-
-  <!-- 왼쪽: 사양표 -->
-  <div class="specs-left">
-    <p class="specs-eyebrow fade">Specifications</p>
-    <h2 class="specs-title fade fade-d1">
-      세심하게 설계된<br>모든 디테일
-    </h2>
-
-    <div class="specs-table fade fade-d2">
-      <div class="spec-row">
-        <span class="spec-key">제품명</span>
-        <span class="spec-val">Rootie One</span>
-      </div>
-      <div class="spec-row">
-        <span class="spec-key">크기 (W × D × H)</span>
-        <span class="spec-val">450 × 400 × 900 mm</span>
-      </div>
-      <div class="spec-row">
-        <span class="spec-key">본체 소재</span>
-        <span class="spec-val">스테인레스 스틸</span>
-      </div>
-      <div class="spec-row">
-        <span class="spec-key">상판 소재</span>
-        <span class="spec-val">나무 오브제 (목재)</span>
-      </div>
-      <div class="spec-row">
-        <span class="spec-key">조명</span>
-        <span class="spec-val">식물 생장용 LED</span>
-      </div>
-      <div class="spec-row">
-        <span class="spec-key">상단 재배 구간</span>
-        <span class="spec-val">400 mm</span>
-      </div>
-      <div class="spec-row">
-        <span class="spec-key">하단 재배 구간</span>
-        <span class="spec-val">300 mm</span>
-      </div>
-      <div class="spec-row">
-        <span class="spec-key">급수 시스템</span>
-        <span class="spec-val">자동급수관 + 수도관</span>
-      </div>
-      <div class="spec-row">
-        <span class="spec-key">온도 조절</span>
-        <span class="spec-val">내장 온도 조절</span>
-      </div>
-      <div class="spec-row">
-        <span class="spec-key">이동 수단</span>
-        <span class="spec-val">4륜 캐스터 (바퀴)</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- 오른쪽: 제품 이미지 (Photoroom 누끼) -->
-  <div class="specs-right fade">
-    <img
-      src="./턴어라운드/260420-151158-add_LED_light_bar_under_wood_(1)-Photoroom.png"
-      alt="Rootie One 구조 분해도">
-  </div>
-
-</section>
-
-
-<!-- ════════ 05 CAROUSEL ════════ -->
-<section class="carousel-section">
-  <div class="carousel-header fade">
-    <p class="specs-eyebrow">Product Detail</p>
-    <h2>360° 뷰</h2>
-  </div>
-
-  <div class="carousel">
-    <div class="carousel__track" id="carouselTrack">
-
-      <!-- SLIDE 1 -->
-      <div class="carousel__slide">
-        <div class="carousel__img">
-          <img src="./턴어라운드/Front - New view-Photoroom.png" alt="정면 뷰">
+    <div class="media-grid" id="lifestyleGrid">
+      <!-- Page 1 (4 images) -->
+      <div class="media-grid__page" id="lg-p1">
+        <div class="grid-cell">
+          <img
+            src="./메인/Modern minimalist kitchen interior, marble countertop, wooden cabinetry, soft morning sunlight through a window, blurred backsplash tiles, cinematic lighting, photorealistic, 8k resolution, high-end lifestyle photo.png"
+            alt="Kitchen">
         </div>
-        <div class="carousel__info">
-          <span class="carousel__num">01 / 03</span>
-          <p class="carousel__label">Front View</p>
-          <h3 class="carousel__title">정면<br>스테인레스 본체</h3>
-          <p class="carousel__desc">
-            전면 개폐형 도어와 스테인레스 스틸 본체.
-            도어를 열면 LED 조명이 켜지며
-            내부 재배 트레이를 확인할 수 있습니다.
-          </p>
-          <div class="carousel__controls">
-            <button class="carousel__btn" id="prevBtn" onclick="moveSlide(-1)" disabled>←</button>
-            <button class="carousel__btn" id="nextBtn" onclick="moveSlide(1)">→</button>
-            <div class="carousel__dots">
-              <button class="carousel__dot active" onclick="goSlide(0)"></button>
-              <button class="carousel__dot" onclick="goSlide(1)"></button>
-              <button class="carousel__dot" onclick="goSlide(2)"></button>
-            </div>
-          </div>
+        <div class="grid-cell">
+          <img
+            src="./메인/Contemporary living room interior, stylish TV stand with a large screen, neutral tone plastered wall, indirect warm LED lighting, minimalist decor, soft shadows, high-quality interior design magazine style, 8k, sha.png"
+            alt="Living Room">
+        </div>
+        <div class="grid-cell">
+          <img
+            src="./메인/Cozy apartment balcony, wooden flooring, lush green indoor plants and Monstera, soft natural outdoor lighting, urban city view blurred in the background, peaceful atmosphere, hyper-realistic, architectural visualiz.png"
+            alt="Balcony">
+        </div>
+        <div class="grid-cell">
+          <img
+            src="./메인/Cozy apartment balcony, wooden flooring, lush green indoor plants and Monstera, soft natural outdoor lighting, urban city view blurred in the background, peaceful atmosphere, hyper-realistic, architectural visu (1).png"
+            alt="Balcony Night">
         </div>
       </div>
 
-      <!-- SLIDE 2 -->
-      <div class="carousel__slide">
-        <div class="carousel__img">
-          <img src="./턴어라운드/Left - New view-Photoroom.png" alt="측면 뷰">
+      <!-- Page 2 (1 image) -->
+      <div class="media-grid__page hidden" id="lg-p2">
+        <div class="grid-cell">
+          <img
+            src="./메인/Contemporary living room interior, stylish TV stand with a large screen, neutral tone plastered wall, indirect warm LED lighting, minimalist decor, soft shadows, high-quality interior design magazine style, 8k, (1).png"
+            alt="Living Room Wide">
         </div>
-        <div class="carousel__info">
-          <span class="carousel__num">02 / 03</span>
-          <p class="carousel__label">Side View</p>
-          <h3 class="carousel__title">측면<br>온도 조절 & 급수 체크</h3>
-          <p class="carousel__desc">
-            측면 디스플레이에서 온도·습도를 실시간 확인.
-            자동급수량 체크 시스템이 내장되어
-            최적의 생장 환경을 유지합니다.
-          </p>
-          <div class="carousel__controls">
-            <button class="carousel__btn" onclick="moveSlide(-1)">←</button>
-            <button class="carousel__btn" onclick="moveSlide(1)">→</button>
-            <div class="carousel__dots">
-              <button class="carousel__dot" onclick="goSlide(0)"></button>
-              <button class="carousel__dot active" onclick="goSlide(1)"></button>
-              <button class="carousel__dot" onclick="goSlide(2)"></button>
-            </div>
-          </div>
+        <!-- empty cells to hold grid structure -->
+        <div class="grid-cell" style="background:var(--gray);"></div>
+        <div class="grid-cell" style="background:var(--gray);"></div>
+        <div class="grid-cell" style="background:var(--gray);"></div>
+      </div>
+    </div>
+
+    <div class="pag-wrap">
+      <button class="pag-btn" id="lg-prev" onclick="lgPage(-1)" disabled>←</button>
+      <span class="pag-counter" id="lg-counter">01 / 02</span>
+      <button class="pag-btn" id="lg-next" onclick="lgPage(1)">→</button>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════
+       ENTRY 03 — product 360° view (1 per page)
+  ══════════════════════════════════ -->
+  <section class="entry">
+    <div class="entry__head">
+      <span class="entry__year">■ 2025</span>
+      <span class="entry__name">Product View, 360°</span>
+      <span class="entry__more" onclick="scrollToTop()">Explore →</span>
+    </div>
+
+    <div class="media-product">
+      <div class="media-product__slides">
+
+        <div class="product-slide active" data-label="Front View">
+          <img
+            src="./턴어라운드/Front - New view-Photoroom.png"
+            alt="Front View">
+        </div>
+
+        <div class="product-slide" data-label="Side View">
+          <img
+            src="./턴어라운드/Left - New view-Photoroom.png"
+            alt="Side View">
+        </div>
+
+        <div class="product-slide" data-label="Exploded View">
+          <img
+            src="./턴어라운드/260420-151158-add_LED_light_bar_under_wood_(1)-Photoroom.png"
+            alt="Exploded View">
+        </div>
+
+      </div>
+    </div>
+
+    <div class="pag-wrap">
+      <button class="pag-btn" id="pv-prev" onclick="pvPage(-1)" disabled>←</button>
+      <span class="pag-counter" id="pv-counter">01 / 03</span>
+      <button class="pag-btn" id="pv-next" onclick="pvPage(1)">→</button>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════
+       INFORMATION
+  ══════════════════════════════════ -->
+  <section id="info">
+
+    <div class="info-body">
+      <!-- Left: small product image + meta -->
+      <div class="info-body__left">
+        <div class="info-img">
+          <img
+            src="./턴어라운드/Front - New view-Photoroom.png"
+            alt="Rootie One">
+        </div>
+        <div class="info-meta">
+          Rootie®<br>
+          Smart Garden Unit<br>
+          Seoul, Korea<br>
+          <br>
+          rootie.com<br>
+          Instagram
         </div>
       </div>
 
-      <!-- SLIDE 3 -->
-      <div class="carousel__slide">
-        <div class="carousel__img">
-          <img src="./턴어라운드/260420-151158-add_LED_light_bar_under_wood_(1)-Photoroom.png" alt="분해 구조">
-        </div>
-        <div class="carousel__info">
-          <span class="carousel__num">03 / 03</span>
-          <p class="carousel__label">Exploded View</p>
-          <h3 class="carousel__title">구조<br>분리형 모듈 설계</h3>
-          <p class="carousel__desc">
-            나무 오브제 상판 → LED 조명 → 자동급수관 →
-            분리 레일 → 화분 트레이 → 수도관.
-            모든 파트가 분리·청소 가능합니다.
-          </p>
-          <div class="carousel__controls">
-            <button class="carousel__btn" onclick="moveSlide(-1)">←</button>
-            <button class="carousel__btn" id="lastNext" onclick="moveSlide(1)" disabled>→</button>
-            <div class="carousel__dots">
-              <button class="carousel__dot" onclick="goSlide(0)"></button>
-              <button class="carousel__dot" onclick="goSlide(1)"></button>
-              <button class="carousel__dot active" onclick="goSlide(2)"></button>
-            </div>
-          </div>
-        </div>
+      <!-- Right: large about text -->
+      <div class="info-body__right">
+        <p class="info-text">
+          Rootie One is a compact smart gardening unit designed
+          for solo living spaces. With full-spectrum LED grow lights,
+          automatic irrigation, modular tray rails, and a
+          stainless steel body topped with solid wood, it lets you
+          grow fresh herbs, greens, and micro-vegetables right where
+          you live — kitchen, living room, or balcony.
+          Take root. Live greener.
+        </p>
+      </div>
+    </div>
+
+    <!-- 3-column info footer -->
+    <div class="info-cols">
+
+      <div class="info-col">
+        <p class="info-col__title">Key Features</p>
+        <ul class="info-col__list">
+          <li>Full-Spectrum LED Grow Light</li>
+          <li>Automatic Irrigation System</li>
+          <li>Detachable Tray Rail</li>
+          <li>Temperature Control</li>
+          <li>Water Volume Monitor</li>
+          <li>4-Wheel Mobile Caster</li>
+        </ul>
       </div>
 
-    </div><!-- /track -->
-  </div><!-- /carousel -->
-</section>
+      <div class="info-col">
+        <p class="info-col__title">Specifications</p>
+        <ul class="info-col__list">
+          <li>W 450 × D 400 × H 900 mm</li>
+          <li>Body — Stainless Steel</li>
+          <li>Top — Solid Wood</li>
+          <li>LED Zone — 50 mm</li>
+          <li>Upper Tray — 400 mm</li>
+          <li>Lower Tray — 300 mm</li>
+          <li>Wheel Clearance — 150 mm</li>
+        </ul>
+      </div>
 
+      <div class="info-col">
+        <p class="info-col__title">What You Can Grow</p>
+        <ul class="info-col__list">
+          <li>Basil</li>
+          <li>Rosemary</li>
+          <li>Lettuce</li>
+          <li>Bok Choy</li>
+          <li>Parsley</li>
+          <li>Green Onion</li>
+          <li>Microgreens</li>
+          <li>Cherry Tomato</li>
+        </ul>
+      </div>
 
-<!-- ════════ 06 CTA ════════ -->
-<section class="cta" id="cta">
-  <p class="cta__label">Get Started</p>
-  <h2 class="cta__title">
-    지금, Rootie와<br>함께 시작하세요
-  </h2>
-  <a href="#" class="cta__btn">구매하기</a>
-</section>
+    </div>
+  </section>
 
+  <!-- bottom corners -->
+  <div class="corners">
+    <span class="sq">■</span>
+    <span class="sq">■</span>
+  </div>
 
-<!-- ════════ FOOTER ════════ -->
+</div><!-- /page -->
+
+<!-- ════════════ FOOTER ════════════ -->
 <footer class="footer">
-  <span class="footer__logo">Rootie</span>
-  <ul class="footer__nav">
-    <li><a href="#">제품</a></li>
-    <li><a href="#">라이프스타일</a></li>
-    <li><a href="#">고객지원</a></li>
-  </ul>
-  <span class="footer__copy">© 2025 Rootie. All rights reserved.</span>
+  <span class="footer__time" id="clock">—</span>
+  <span class="footer__copy">© 2025 Rootie</span>
+  <span>Rootie®</span>
 </footer>
 
 
 <script>
-  /* ── Fade-in on scroll ── */
-  const io = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) { e.target.classList.add('on'); io.unobserve(e.target); }
-    });
-  }, { threshold: 0.1 });
-  document.querySelectorAll('.fade').forEach(el => io.observe(el));
+  /* ── Clock ── */
+  function tick() {
+    const d = new Date();
+    const h = String(d.getHours()).padStart(2,'0');
+    const m = String(d.getMinutes()).padStart(2,'0');
+    const s = String(d.getSeconds()).padStart(2,'0');
+    const ap = d.getHours() >= 12 ? 'PM' : 'AM';
+    document.getElementById('clock').textContent =
+      `${h}:${m}:${s} ${ap}`;
+  }
+  tick();
+  setInterval(tick, 1000);
 
-  /* ── Nav scroll ── */
-  const nav = document.querySelector('.nav');
-  window.addEventListener('scroll', () => {
-    nav.style.background = window.scrollY > 50
-      ? 'rgba(255,255,255,0.97)' : 'rgba(255,255,255,0.88)';
-  });
+  /* ── Lifestyle grid pagination ── */
+  let lgCur = 1;
+  const lgPages = [null, document.getElementById('lg-p1'), document.getElementById('lg-p2')];
+  const lgTotal = 2;
 
-  /* ── Carousel ── */
-  const track  = document.getElementById('carouselTrack');
-  const slides = track.querySelectorAll('.carousel__slide');
-  const total  = slides.length;
-  let cur = 0;
+  function lgPage(dir) {
+    lgPages[lgCur].classList.add('hidden');
+    lgCur = Math.min(Math.max(lgCur + dir, 1), lgTotal);
+    lgPages[lgCur].classList.remove('hidden');
 
-  function updateCarousel() {
-    // 트랙 이동
-    track.style.transform = `translateX(-${cur * 100}%)`;
-
-    // 모든 슬라이드의 dots & 버튼 동기화
-    slides.forEach((slide, idx) => {
-      const dots = slide.querySelectorAll('.carousel__dot');
-      dots.forEach((d, di) => d.classList.toggle('active', di === cur));
-
-      const btns = slide.querySelectorAll('.carousel__btn');
-      btns[0].disabled = (cur === 0);           // prev
-      btns[1].disabled = (cur === total - 1);   // next
-    });
+    document.getElementById('lg-prev').disabled = (lgCur === 1);
+    document.getElementById('lg-next').disabled = (lgCur === lgTotal);
+    document.getElementById('lg-counter').textContent =
+      `0${lgCur} / 0${lgTotal}`;
   }
 
-  function moveSlide(dir) {
-    const next = cur + dir;
-    if (next < 0 || next >= total) return;
-    cur = next;
-    updateCarousel();
+  /* ── Product view pagination ── */
+  let pvCur = 0;
+  const pvSlides = document.querySelectorAll('.product-slide');
+  const pvTotal  = pvSlides.length;
+
+  function pvPage(dir) {
+    pvSlides[pvCur].classList.remove('active');
+    pvCur = Math.min(Math.max(pvCur + dir, 0), pvTotal - 1);
+    pvSlides[pvCur].classList.add('active');
+
+    document.getElementById('pv-prev').disabled = (pvCur === 0);
+    document.getElementById('pv-next').disabled = (pvCur === pvTotal - 1);
+    document.getElementById('pv-counter').textContent =
+      `0${pvCur + 1} / 0${pvTotal}`;
   }
 
-  function goSlide(idx) {
-    cur = idx;
-    updateCarousel();
-  }
-
-  // 키보드 지원
+  /* ── Keyboard navigation ── */
   document.addEventListener('keydown', e => {
-    if (e.key === 'ArrowLeft')  moveSlide(-1);
-    if (e.key === 'ArrowRight') moveSlide(1);
+    if (e.key === 'ArrowLeft')  pvPage(-1);
+    if (e.key === 'ArrowRight') pvPage(1);
   });
 
-  // 터치 스와이프 지원
-  let touchStartX = 0;
-  track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
-  track.addEventListener('touchend',   e => {
-    const diff = touchStartX - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 50) moveSlide(diff > 0 ? 1 : -1);
-  });
+  /* ── Scroll to top helper ── */
+  function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 </script>
 
 </body>
